@@ -133,6 +133,8 @@ kubectl port-forward service/wordpress -n wp 8080:80
 # now you can access the wordpress site at http://localhost:8080 in you browser
 ```
 
+You should see the WordPress [installation page](wordpress.png)
+
 ## Submission
 Please push up all of your changes to the main branch of your project, and submit the link to your GitHub repository in Canvas.
 
@@ -141,7 +143,7 @@ Please push up all of your changes to the main branch of your project, and submi
 To clean up the resources and delete the KinD cluster, run the following command:
 
 ```bash
-kind delete cluster --name wp-cluster
+kind delete cluster --name kind-cs1660
 ```
 
 This will remove the KinD cluster and all associated resources.
