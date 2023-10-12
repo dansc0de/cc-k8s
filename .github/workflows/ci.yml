@@ -1,0 +1,30 @@
+name: Validate WordPress Deployment
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Start minikube
+        uses: medyagh/setup-minikube@latest
+
+      - name: Apply Kubernetes manifests
+        run: |
+          kubectl apply -f manifests/
+
+      - name: Wait for pods to be ready
+        run: |
+          kubectl wait --for=condition=available --timeout=120s deployment/wordpress
+          kubectl wait --for=condition=available --timeout=120s deployment/wordpress-mysql
+
+      - name: Run check.sh
+        run: |
+          ./check.sh

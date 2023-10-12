@@ -1,0 +1,65 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress
+  labels:
+    app: wordpress
+    tier: frontend
+spec:
+  ports:
+    - port: 80
+  ##
+  # Create service selector labels here
+  ##
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wordpress
+data:
+  ##
+  # create non-sensative data attributes
+  ##
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress
+  labels:
+    app: wordpress
+    tier: frontend
+spec:
+  replicas: 3
+  ##
+  # Create app selector labels here
+  ##
+  template:
+    ##
+    # Create metadata labels here
+    ##
+    spec:
+      containers:
+      - image: wordpress:6.2.1-apache
+        name: wordpress
+        env:
+        ##
+        # mount non-sensitive environment vars from configmap ref
+        # WORDPRESS_DB_HOST | WORDPRESS_DB_USER
+        ##
+
+        ##
+        # mount sensitive environment vars from secret ref
+        # WORDPRESS_DB_PASSWORD (hint use the user-password key)
+        ##
+        ports:
+        - containerPort: 80
+          name: wordpress
+      ##
+      # define volume mounts here, be sure to reference
+      # the PVC in your container spec
+      ##
+---
+##
+# Create persistent volume claim here
+##
