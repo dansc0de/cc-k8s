@@ -40,6 +40,8 @@ We need the [ingress](https://kubernetes.io/docs/concepts/services-networking/in
 # install the nginx ingress controller
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
 
+kubectl create namespace wordpress
+
 # install the ingress resource
 kubectl apply -f ./config/ingress.yaml
 ```
