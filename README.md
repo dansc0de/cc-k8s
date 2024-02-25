@@ -35,17 +35,28 @@ kubectl get namespace
 ### Step 2: Install Nginx Ingress Controller 
 Install the Nginx Ingress Controller and set up an Ingress by running the following command:
 
-We need the [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) controller to route traffic to our wordpress service.  The ingress controller is a deployment that runs in the cluster and watches for ingress resources.  When it sees an ingress resource, it will configure the nginx reverse proxy to route traffic to the appropriate service that matches the label selector of the workload.
+We need the [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) controller to route traffic to our `wordpress` service.  The ingress controller is a deployment that runs in the cluster and watches for ingress resources.  When it sees an ingress resource, it will configure the nginx reverse proxy to route traffic to the appropriate service that matches the label selector of the workload.
+
 ```bash
 # install the nginx ingress controller
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
 
+# create namespace for wordpress
+kubectl apply -f ./config/namespace.yaml
+
 # install the ingress resource
 kubectl apply -f ./config/ingress.yaml
+
+# verify the ingress controller is running
+kubectl get pods -n ingress-nginx
+NAME                                        READY   STATUS      RESTARTS   AGE
+ingress-nginx-admission-create-jgsmf        0/1     Completed   0          8m2s
+ingress-nginx-admission-patch-fd4wg         0/1     Completed   1          8m2s
+ingress-nginx-controller-7c94d9d5c5-dh9kg   1/1     Running     0          8m2s
 ```
 
-### Step 3: Create `wordpress` Namespace and Database Password Secret:
-You need to create [Namespace](https://kubernetes.io/docs/tasks/administer-cluster/namespaces-walkthrough/) and Secret resources. Both manifest fileshould be created in the `config` directory. The file should be named `namespace.yaml` and `secret.yam;` respectively.
+### Step 3: Create Database Password Secret:
+You need to create an Opaque Kubernetes Secret resources. The file should be named `secret.yaml` and located in the `config` directory.
 
 
 ### Step 4: Deploy MySQL for WordPress
