@@ -8,7 +8,6 @@ metadata:
 spec:
   ports:
     - port: 80
-  selector: {}
   type: ClusterIP
 ---
 apiVersion: apps/v1
@@ -19,11 +18,7 @@ metadata:
   labels:
     app: wordpress
 spec:
-  selector:
-    matchLabels: {}
   template:
-    metadata:
-      labels: {}
     spec:
       containers:
       - image: wordpress:6.2.1-apache
