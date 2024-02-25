@@ -19,11 +19,7 @@ metadata:
   labels:
     app: wordpress
 spec:
-  selector:
-    matchLabels: {}
   template:
-    metadata:
-      labels: {}
     spec:
       containers:
       - image: mysql:8.0
@@ -33,11 +29,6 @@ spec:
           value: wordpress
         - name: MYSQL_USER
           value: wordpress
-        - name: MYSQL_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mysql-pass
-              key: password
         ports:
         - containerPort: 3306
           name: mysql
