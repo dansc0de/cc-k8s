@@ -2,6 +2,8 @@
 
 In this assignment, you will deploy a WordPress application on a local Kubernetes cluster using KinD (Kubernetes in Docker). KinD is a tool for running local Kubernetes clusters using Docker container nodes.
 
+**PLEASE READ** - all changes must be included in manifest files in the config directory. Otherwise I cannot properly grade your submission.
+
 ## Prerequisites
 
 Before you begin, make sure you have the following prerequisites set up on your system:
@@ -56,7 +58,7 @@ ingress-nginx-controller-7c94d9d5c5-dh9kg   1/1     Running     0          8m2s
 ```
 
 ### Step 3: Create Database Password Secret:
-You need to create an Opaque Kubernetes Secret resources. The file should be named `secret.yaml` and located in the `config` directory.
+You need to create an Opaque Kubernetes Secret resources. The file should be named `secret.yaml` and located in the `config` directory. Please refer to the document I published on Canvas.
 
 
 ### Step 4: Deploy MySQL for WordPress
@@ -128,9 +130,7 @@ kubectl port-forward service/wordpress -n wp 8080:80
 You should see the WordPress [installation page](wordpress.png)
 
 ## Submission
-Please push up all of your changes to the main branch of your project, and submit the link to your GitHub repository in Canvas.
-
-**PLEASE READ** - all changes must be included in manifest files in the config directory. Otherwise I cannot properly grade your submission.
+Please push up all of your changes to the main branch of your repository, and submit the link to your GitHub repository in Canvas.
 
 ## Cleanup
 
