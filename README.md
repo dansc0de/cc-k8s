@@ -24,17 +24,19 @@ Follow these steps to create your local Kubernetes cluster and install nginx Ing
 Create a KinD cluster by running the following command:
 
 ```bash
-kind create cluster --name cs1660 --config kind-cluster.yaml
+kind create cluster --name cloud --config kind-cluster.yaml
 
 # set you kubectl context
-kubectl config set-context kind-cs1660
+kubectl config set-context cloud
 
 
 # verify you can talk to the new cluster
 kubectl get namespace
 ```
-
 ### Step 2: Install Nginx Ingress Controller 
+Create a namespace called `wordpress` in the cluster. The file should be named `namespace.yaml` and located in the `config` directory.
+
+### Step 3: Install Nginx Ingress Controller 
 Install the Nginx Ingress Controller and set up an Ingress by running the following command:
 
 We need the [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) controller to route traffic to our `wordpress` service.  The ingress controller is a deployment that runs in the cluster and watches for ingress resources.  When it sees an ingress resource, it will configure the nginx reverse proxy to route traffic to the appropriate service that matches the label selector of the workload.
@@ -57,20 +59,18 @@ ingress-nginx-admission-patch-fd4wg         0/1     Completed   1          8m2s
 ingress-nginx-controller-7c94d9d5c5-dh9kg   1/1     Running     0          8m2s
 ```
 
-### Step 3: Create Database Password Secret:
-You need to create an Opaque Kubernetes Secret resources. The file should be named `secret.yaml` and located in the `config` directory. Please refer to the document I published on Canvas.
+### Step 4: Create Database Password Secret:
+You need to create an Opaque Kubernetes Secret resources. The file should be named `secret.yaml` and located in the `config` directory.
 
 
-### Step 4: Deploy MySQL for WordPress
+### Step 5: Deploy MySQL for WordPress
 
 Your task is to update the MySQL manifests in the [config](./config) directory. Ensure that your MySQL deployment meets the following criteria:
 
 - Run the MySQL deployment in the `wordpress` namespace.
-- Set the `MYSQL_ROOT_PASSWORD` root password and `MYSQL_PASSWORD` securely from the same **Kubernetes Secret** you created in step 3.
-  - Hint: Use the `valueFrom` [field](https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#define-container-environment-variables-using-secret-data) in the `env` section of the deployment.
 - Define the deployments resource requests and limits.
-  - please request `250Mi` memory and `200m` CPU
-- Create a PersistentVolumeClaim named `mysql-pv-claim` that is 1Gi, in `ReadWriteOnce` mode.
+  - please request sixty-four megabytes (`64Mi`) of memory and two hundred millicores (`200m`) CPU
+- Create a PersistentVolumeClaim named `mysql-pv-claim` that is 100Mi, in `ReadWriteOnce` mode.
   - Hint: create a `persistentvolumeclaims` [object](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims).
 - Mount the PersistentVolumeClaim to the `/var/lib/mysql` directory in the MySQL container on the deployment object like [this](https://akomljen.com/kubernetes-persistent-volumes-with-deployment-and-statefulset/).
   - Hint: Use the `volumeMounts` [field](https://kubernetes.io/docs/tasks/configure-pod-container/configure-volume-storage/#create-a-pod-that-uses-a-persistentvolumeclaim) in the deployment.
@@ -82,6 +82,9 @@ Your task is to update the MySQL manifests in the [config](./config) directory. 
 Verify that the MySQL deployment is running by running the following command:
 
 ```bash
+# create the mysql deployment
+kubectl apply -f ./config/mysql-deployment.yaml
+
 # all the pods should be `Healthy` status
 kubectl get pods -n wordpress
 
@@ -89,13 +92,13 @@ kubectl get pods -n wordpress
 kubectl describe pod <pod-name> -n wordpress
 ```
 
-### Step 5: Deploy WordPress
+### Step 5: Deploy WordPress App
 
 Your task is to update the Wordpress manifests in the [config](./config) directory. Ensure that your Wordpress deployment meets the following criteria:
 
 - Run the `Wordpress` deployment in the `wordpress` namespace.
 - Define appropriate resource requests and limits.
-  - please request `200Mi` memory and `100m` CPU
+  - please request two hundred megabytes (`200Mi`) memory and one hundred millicores (`100m`) of CPU
 - Create a PersistentVolumeClaim named `wp-pv-claim` that is 1Gi, in `ReadWriteOnce` mode.
   - Hint: create a `persistentvolumeclaims` [object](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims).
 - Mount the PersistentVolumeClaim to the `/var/www/html` directory in the Wordpress container on the deployment object like [this](https://akomljen.com/kubernetes-persistent-volumes-with-deployment-and-statefulset/).
@@ -108,6 +111,9 @@ Your task is to update the Wordpress manifests in the [config](./config) directo
 Verify that the WordPress deployment is running by running the following command:
 
 ```bash
+# create the wordpress deployment
+kubectl apply -f ./config/wp-deployment.yaml
+
 # all the pods should be `Healthy` status
 kubectl get pods -n wordpress
 
@@ -137,7 +143,7 @@ Please push up all of your changes to the main branch of your repository, and su
 To clean up the resources and delete the KinD cluster, run the following command:
 
 ```bash
-kind delete cluster --name kind-cs1660
+kind delete cluster --name cloud
 ```
 
 This will remove the KinD cluster and all associated resources.
