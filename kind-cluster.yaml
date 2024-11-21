@@ -1,3 +1,8 @@
+##
+# Do NOT ALTER
+# Create a "local" Kubernetes Cluster with Docker containers
+# consisting of one control plane node and two worker nodes.
+##
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
