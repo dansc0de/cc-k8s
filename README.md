@@ -1,4 +1,4 @@
-# CS1660 WordPress Deployment on Local Kubernetes Cluster using KinD
+# WordPress Deployment on Local Kubernetes Cluster using KinD
 
 In this assignment, you will deploy a WordPress application on a local Kubernetes cluster using KinD (Kubernetes in Docker). KinD is a tool for running local Kubernetes clusters using Docker container nodes.
 
@@ -11,6 +11,24 @@ Before you begin, make sure you have the following prerequisites set up on your 
 1. [Docker](https://www.docker.com/get-started) installed.
 2. [Kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) installed.
 3. [KinD](https://kind.sigs.k8s.io/docs/user/quick-start/) (Kubernetes in Docker) installed.
+
+## Rubric
+
+| **Criteria**                    | **Description**                                                                                      | **Points** |
+|---------------------------------|-----------------------------------------------------------------------------------------------------|------------|
+| **namespace.yaml**              | A properly configured `namespace.yaml` file that defines the `wordpress` namespace for the project. | 1          |
+| **MySQL Deployment**            | A functional MySQL deployment with:                                                                 | 5          |
+|                                 | - Resource requests: `64Mi` memory, `200m` CPU.                                                     |            |
+|                                 | - PersistentVolumeClaim `mysql-pv-claim` (100Mi, `ReadWriteOnce`), mounted to `/var/lib/mysql`.      |            |
+|                                 | - Proper matchSelector and pod template labels: `app: wordpress`, `tier: mysql`.                   |            |
+| **WordPress Deployment**        | A functional WordPress deployment with:                                                             | 5          |
+|                                 | - Resource requests: `200Mi` memory, `100m` CPU.                                                    |            |
+|                                 | - PersistentVolumeClaim `wp-pv-claim` (1Gi, `ReadWriteOnce`), mounted to `/var/www/html`.           |            |
+|                                 | - Proper matchSelector and pod template labels: `app: wordpress`, `tier: frontend`.                |            |
+| **Overall Functionality**       | Successfully accessing the WordPress installation page via Ingress or port-forwarding.              | 2          |
+
+**Total Points:** 13
+
 
 ## Getting Started
 
@@ -33,7 +51,7 @@ kubectl config set-context cloud
 # verify you can talk to the new cluster
 kubectl get namespace
 ```
-### Step 2: Install Nginx Ingress Controller 
+### Step 2: Create `Wordpress` Namespace
 Create a namespace called `wordpress` in the cluster. The file should be named `namespace.yaml` and located in the `config` directory.
 
 ### Step 3: Install Nginx Ingress Controller 
@@ -59,11 +77,7 @@ ingress-nginx-admission-patch-fd4wg         0/1     Completed   1          8m2s
 ingress-nginx-controller-7c94d9d5c5-dh9kg   1/1     Running     0          8m2s
 ```
 
-### Step 4: Create Database Password Secret:
-You need to create an Opaque Kubernetes Secret resources. The file should be named `secret.yaml` and located in the `config` directory.
-
-
-### Step 5: Deploy MySQL for WordPress
+### Step 4: Deploy MySQL for WordPress
 
 Your task is to update the MySQL manifests in the [config](./config) directory. Ensure that your MySQL deployment meets the following criteria:
 
@@ -79,7 +93,7 @@ Your task is to update the MySQL manifests in the [config](./config) directory. 
 - Create pod template labels `app: wordpress` and `tier: mysql` for the MySQL deployment.
   - Hint: Use the `labels` [field](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors) in the deployment.
 
-Verify that the MySQL deployment is running by running the following command:
+Create and Verify that the MySQL deployment is running by running the following command:
 
 ```bash
 # create the mysql deployment
@@ -108,7 +122,7 @@ Your task is to update the Wordpress manifests in the [config](./config) directo
 - Create pod template labels `app: wordpress` and `tier: frontend` for the MySQL deployment.
   - Hint: Use the `labels` [field](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors) in the deployment.
 
-Verify that the WordPress deployment is running by running the following command:
+Create and Verify that the WordPress deployment is running by running the following command:
 
 ```bash
 # create the wordpress deployment

@@ -1,5 +1,5 @@
 ##
-# DO NOT TOUCH THIS FILE
+# DO NOT ALTER
 ##
 ---
 apiVersion: networking.k8s.io/v1
