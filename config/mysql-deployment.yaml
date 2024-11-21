@@ -2,15 +2,16 @@ apiVersion: v1
 kind: Service
 metadata:
   name: wordpress-mysql
+  namespace: wordpress
   labels:
     app: wordpress
     tier: mysql
 spec:
   ports:
     - port: 3306
-  selector:
-    app: wordpress
-    tier: mysql
+  ##
+  # Create service selector labels here
+  ##
   clusterIP: None
 ---
 apiVersion: apps/v1
@@ -23,7 +24,7 @@ metadata:
     tier: mysql
 spec:
   ##
-  # Create label selectors here
+  # Create app label selectors here
   ##
   template:
     metadata:
@@ -41,17 +42,19 @@ spec:
           value: wordpress
         - name: MYSQL_ROOT_PASSWORD
           value: supers3cr3t
+        - name: MYSQL_PASSWORD
+          value: supers3cr3t
         ports:
         - containerPort: 3306
           name: mysql
         ##
         # create resource limits here
         ##
-    ##
-    # define volume mounts here, be sure to reference
-    # the PVC in your container spec
-    ##
+      ##
+      # define volume mounts here, be sure to reference
+      # the PVC in your container spec
+      ##
 ---
 ##
-# Create persistant volume claim in this file
+# Create persistent volume claim here
 ##

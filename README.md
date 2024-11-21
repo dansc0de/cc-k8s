@@ -79,16 +79,14 @@ ingress-nginx-controller-7c94d9d5c5-dh9kg   1/1     Running     0          8m2s
 Your task is to update the MySQL manifests in the [config](./config) directory. Ensure that your MySQL deployment meets the following criteria:
 
 - Run the MySQL deployment in the `wordpress` namespace.
-- Define the deployments resource requests and limits.
+- Define the deployments resource requests.
   - please request sixty-four megabytes (`64Mi`) of memory and two hundred millicores (`200m`) CPU
-- Create a PersistentVolumeClaim named `mysql-pv-claim` that is 100Mi, in `ReadWriteOnce` mode.
+- Create a PersistentVolumeClaim named `mysql-pv-claim` that is 250 Mebibytes, in `ReadWriteOnce` mode.
   - Hint: create a `persistentvolumeclaims` [object](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims).
 - Mount the PersistentVolumeClaim to the `/var/lib/mysql` directory in the MySQL container on the deployment object like [this](https://akomljen.com/kubernetes-persistent-volumes-with-deployment-and-statefulset/).
   - Hint: Use the `volumeMounts` [field](https://kubernetes.io/docs/tasks/configure-pod-container/configure-volume-storage/#create-a-pod-that-uses-a-persistentvolumeclaim) in the deployment.
 - Create matchSelector labels `app: wordpress` and `tier: mysql` for the MySQL deployment.
   - Hint: Use the `matchLabels` [field](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors) in the deployment.
-- Create pod template labels `app: wordpress` and `tier: mysql` for the MySQL deployment.
-  - Hint: Use the `labels` [field](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors) in the deployment.
 
 Create and Verify that the MySQL deployment is running by running the following command:
 
@@ -110,14 +108,12 @@ Your task is to update the Wordpress manifests in the [config](./config) directo
 - Run the `Wordpress` deployment in the `wordpress` namespace.
 - Define appropriate resource requests and limits.
   - please request two hundred megabytes (`200Mi`) memory and one hundred millicores (`100m`) of CPU
-- Create a PersistentVolumeClaim named `wp-pv-claim` that is 1Gi, in `ReadWriteOnce` mode.
+- Create a PersistentVolumeClaim named `wp-pv-claim` that is 100 Mebibytes, in `ReadWriteOnce` mode.
   - Hint: create a `persistentvolumeclaims` [object](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims).
 - Mount the PersistentVolumeClaim to the `/var/www/html` directory in the Wordpress container on the deployment object like [this](https://akomljen.com/kubernetes-persistent-volumes-with-deployment-and-statefulset/).
   - Hint: Use the `volumeMounts` [field](https://kubernetes.io/docs/tasks/configure-pod-container/configure-volume-storage/#create-a-pod-that-uses-a-persistentvolumeclaim) in the deployment.
 - Create matchSelector labels `app: wordpress` and `tier: frontend` for the MySQL deployment.
   - Hint: Use the `matchLabels` [field](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors) in the deployment.
-- Create pod template labels `app: wordpress` and `tier: frontend` for the MySQL deployment.
-  - Hint: Use the `labels` [field](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors) in the deployment.
 
 Create and Verify that the WordPress deployment is running by running the following command:
 
