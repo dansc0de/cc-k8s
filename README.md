@@ -26,6 +26,8 @@ Ensure the following tools are installed on your system:
 
 ## 🤔 What is WordPress (and Why Should You Care)?
 
+![wordpress setup page](wordpress.png)
+
 [WordPress](https://wordpress.org/) is the world’s most popular content management system (CMS). It powers blogs, portfolios, ecommerce stores, news sites, recipe blogs your aunt still updates, and basically half the internet.
 
 It runs on PHP, stores data in MySQL, and serves HTML pages using a web server like Apache — making it the perfect example of a classic web stack.
@@ -159,9 +161,28 @@ You must configure the following resources using Kubernetes manifests:
 
 ---
 
-## 📤 Submission
+## Submission
 
 Push your code to the `main` branch of your GitHub repository. Then submit your GitHub URL to Canvas.
 
-A **GitHub Actions workflow** will run on every commit to validate your manifests. If the workflow passes, your assignment is considered complete and ready for grading.
+A **GitHub Actions workflow** will run on every commit to validate your manifests. It uses a script called `check.sh` to verify that your Kubernetes resources are configured correctly. This script checks for the presence of:
 
+- Required Deployments, Services, PVCs, ConfigMaps, and Secrets
+- Correct environment variable mounting from ConfigMaps and Secrets
+- An accessible WordPress installation page (HTTP 200 response from `/wp-admin/install.php`)
+
+You can test your setup locally using the same script:
+
+```bash
+./check.sh
+```
+
+Alternatively, you can manually verify the setup by running:
+
+```bash
+kubectl port-forward svc/wordpress 8080:80
+```
+
+Then open [http://localhost:8080](http://localhost:8080) in your browser to confirm that the WordPress install page loads.
+
+If the script or manual check succeeds, your submission is likely ready for grading!
