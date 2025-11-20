@@ -9,8 +9,13 @@ metadata:
 spec:
   ports:
     - port: 80
+      name: http
+  selector:
+    app: wordpress
+    tier: frontend
   ##
-  # Create service selector labels here
+  # create service selector labels here
+  # hint: match the deployment's labels (app: wordpress, tier: frontend)
   ##
 ---
 apiVersion: v1
@@ -18,8 +23,12 @@ kind: ConfigMap
 metadata:
   name: wordpress
 data:
+  host: "wordpress-mysql"
+  user: "wordpress"
   ##
-  # create non-sensative data attributes
+  # create non-sensitive data attributes
+  # host: wordpress-mysql
+  # user: wordpress
   ##
 ---
 apiVersion: apps/v1
@@ -31,35 +40,85 @@ metadata:
     tier: frontend
 spec:
   replicas: 3
+  selector:
+    matchLabels:
+      app: wordpress
+      tier: frontend
   ##
-  # Create app selector labels here
+  # create deployment selector here
+  # app: wordpress
+  # tier: frontend
   ##
   template:
+    metadata:
+      labels:
+        app: wordpress
+        tier: frontend
     ##
-    # Create metadata labels here
+    # create pod metadata labels here (match the selectorLabels)
     ##
     spec:
       containers:
       - image: wordpress:6.2.1-apache
         name: wordpress
         env:
+          - name: WORDPRESS_DB_HOST
+            valueFrom:
+              configMapKeyRef:
+                key: host
+                name: wordpress
+          - name: WORDPRESS_DB_USER
+            valueFrom:
+              configMapKeyRef:
+                key: user
+                name: wordpress-mysql
         ##
-        # mount non-sensitive environment vars from configmap ref
-        # WORDPRESS_DB_HOST | WORDPRESS_DB_USER
+        # mount non-sensitive environment vars from configmap using configMapKeyRef
+        # WORDPRESS_DB_HOST (from wordpress configmap, key: host)
+        # WORDPRESS_DB_USER (from wordpress configmap, key: user)
         ##
-
+          - name: WORDPRESS_DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: user-password
+                name: database
         ##
-        # mount sensitive environment vars from secret ref
-        # WORDPRESS_DB_PASSWORD (hint use the user-password key)
+        # mount sensitive environment vars from secret using secretKeyRef
+        # WORDPRESS_DB_PASSWORD (from database secret, key: user-password)
         ##
         ports:
         - containerPort: 80
           name: wordpress
+        ##
+        # add volumeMounts inside the container spec above
+        # mount path: /var/www/html
+        ##
+        volumeMounts:
+          - mountPath: /var/www/html
+            name: data
       ##
-      # define volume mounts here, be sure to reference
-      # the PVC in your container spec
+      # add volumes at the pod spec level (same indentation as containers)
+      # reference the PVC: wp-pv-claim
       ##
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: wp-pv-claim
 ---
 ##
-# Create persistent volume claim here
+# create persistent volume claim here
+# name: wp-pv-claim
+# storage: 1Gi
+# accessModes: ReadWriteOnce
 ##
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wp-pv-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: standard

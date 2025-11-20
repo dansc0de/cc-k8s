@@ -118,7 +118,7 @@ kubectl port-forward pod/wordpress-xxzzsss 8080:8000
 
 ## There's More!
 
-`kubectl` is incredibly powerful — more than can fit in one README. It supports:
+`kubectl` is incredibly powerful more than can fit in one README. It supports:
 
 - Label and annotation management
 - Resource editing (`kubectl edit`)
@@ -127,4 +127,4 @@ kubectl port-forward pod/wordpress-xxzzsss 8080:8000
 - And much more!
 
 Check out the official documentation here:  
-👉 https://kubernetes.io/docs/reference/kubectl/
+https://kubernetes.io/docs/reference/kubectl/

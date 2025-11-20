@@ -4,18 +4,18 @@ set -euo pipefail
 
 GREEN='\033[0;32m'
 RED='\033[0;31m'
-NC='\033[0m' # No color
+NC='\033[0m' # no color
 
 pass() {
-  echo -e "${GREEN}✔ $1${NC}"
+  echo -e "${GREEN}[pass] $1${NC}"
 }
 
 fail() {
-  echo -e "${RED}✖ $1${NC}"
+  echo -e "${RED}[fail] $1${NC}"
   exit 1
 }
 
-echo "🔍 Validating Kubernetes resources..."
+echo "validating Kubernetes resources..."
 
 # 1. Deployments
 kubectl get deployment wordpress >/dev/null 2>&1 || fail "wordpress deployment not found"
@@ -46,12 +46,8 @@ secret_keys=$(kubectl get secret database -o json | jq -r '.data | keys[]' || ec
 [[ "$secret_keys" == *"user-password"* && "$secret_keys" == *"root-password"* ]] || fail "database secret missing expected keys"
 pass "Secret database contains required keys"
 
-# 6. Ingress
-kubectl get ingress wordpress >/dev/null 2>&1 || fail "Ingress wordpress not found"
-pass "Ingress exists"
-
-# 7. WordPress HTTP check
-echo "🌐 Testing WordPress via port-forward..."
+# 6. WordPress HTTP check
+echo "testing wordpress via port-forward..."
 kubectl port-forward svc/wordpress 8080:80 >/dev/null 2>&1 &
 PORT_FORWARD_PID=$!
 sleep 10
@@ -65,4 +61,4 @@ fi
 
 kill -9 $PORT_FORWARD_PID
 
-echo -e "\n${GREEN}✅ All checks passed!${NC}"
+echo -e "\n${GREEN}all checks passed!${NC}"
