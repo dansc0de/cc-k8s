@@ -11,9 +11,6 @@ spec:
     - port: 3306
       name: http
       targetPort: 3306
-  selector:
-    app: wordpress
-    tier: mysql
   ##
   # create service selector labels here
   # hint: should match the deployment's labels
@@ -27,8 +24,6 @@ kind: ConfigMap
 metadata:
   name: wordpress-mysql
 data:
-  database: "wordpress"
-  user: "wordpress"
   ##
   # create non-sensitive data attributes
   # database: wordpress
@@ -43,20 +38,12 @@ metadata:
     app: wordpress
     tier: mysql
 spec:
-  selector:
-    matchLabels:
-      app: wordpress
-      tier: mysql
   ##
   # create deployment selector here
   # app: wordpress
   # tier: mysql
   ##
   template:
-    metadata:
-      labels:
-        app: wordpress
-        tier: mysql
     ##
     # create pod metadata labels here (match the selectorLabels)
     ##
@@ -65,31 +52,12 @@ spec:
       - image: mysql:8.0
         name: mysql
         env:
-          - name: MYSQL_DATABASE
-            valueFrom:
-              configMapKeyRef:
-                key: database
-                name: wordpress-mysql
-          - name: MYSQL_USER
-            valueFrom:
-              configMapKeyRef:
-                key: user
-                name: wordpress-mysql
         ##
         # mount non-sensitive environment vars from configmap using configMapKeyRef
         # MYSQL_DATABASE (from wordpress-mysql configmap, key: database)
         # MYSQL_USER (from wordpress-mysql configmap, key: user)
         ##
-          - name: MYSQL_ROOT_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                key: root-password
-                name: database
-          - name: MYSQL_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                key: user-password
-                name: database
+
         ##
         # mount sensitive environment vars from secret using secretKeyRef
         # MYSQL_ROOT_PASSWORD (from database secret, key: root-password)
@@ -98,9 +66,6 @@ spec:
         ports:
         - containerPort: 3306
           name: mysql
-        volumeMounts:
-          - mountPath: /var/lib/mysql
-            name: data
         ##
         # add volumeMounts inside the container spec above
         # mount path: /var/lib/mysql
@@ -110,10 +75,6 @@ spec:
       # add volumes at the pod spec level (same indentation as containers)
       # reference the PVC: mysql-pv-claim
       ##
-      volumes:
-        - name: data
-          persistentVolumeClaim:
-            claimName: mysql-pv-claim
 ---
 ##
 # create persistent volume claim here
@@ -121,14 +82,4 @@ spec:
 # storage: 1Gi
 # accessModes: ReadWriteOnce
 ##
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: mysql-pv-claim
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
-  storageClassName: standard
+
