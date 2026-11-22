@@ -1,18 +1,19 @@
-# WordPress Deployment on Local Kubernetes Cluster using Minikube
+# WordPress Deployment on Local Kubernetes Cluster using kind (Kubernetes in Docker)
 
-In this assignment, you will deploy a WordPress application on a local Kubernetes cluster using **Minikube** (Kubernetes v1.33). The deployment includes both a WordPress frontend and a MySQL backend, configured using Kubernetes manifest files.
+In this assignment, you will deploy a WordPress application on a local Kubernetes cluster using **kind** (Kubernetes in Docker, Kubernetes v1.37). The deployment includes both a WordPress frontend and a MySQL backend, configured using Kubernetes manifest files.
 
 all configuration files **must be placed in the `manifests/` directory**. your submission will be evaluated automatically through a **GitHub Actions workflow** that runs every time you push to the repository. if the workflow passes, your assignment is considered complete and ready for grading.
 
-**reference documentation**: for detailed kubernetes resource specifications, see the [kubernetes api v1.33 reference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/).
+**reference documentation**: for detailed kubernetes resource specifications, see the [kubernetes api v1.37 reference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/).
 
 ---
 
 ## Docs
 
-- [Minikube Guide](./docs/minikube.md)
+- [kind Guide](./docs/kind.md)
+- [Troubleshooting Guide](./docs/troubleshooting.md)
 - [kubectl Reference](./docs/kubectl.md)
-- [Kubernetes API v1.33 Reference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/)
+- [Kubernetes API v1.37 Reference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/)
 
 ---
 
@@ -20,9 +21,9 @@ all configuration files **must be placed in the `manifests/` directory**. your s
 
 Ensure the following tools are installed on your system:
 
-- [Docker](https://www.docker.com/get-started)
+- [Docker](https://www.docker.com/get-started) (must be running; kind uses it to run the cluster)
 - [Kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
-- [Minikube](https://minikube.sigs.k8s.io/docs/start/)
+- [kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
 
 ---
 
@@ -161,7 +162,7 @@ You must configure the following resources using Kubernetes manifests:
 | **WordPress Service**    | Service with correct selector and port                                         | 2          |
 | **ConfigMaps**           | `wordpress` and `wordpress-mysql` with correct keys and used in deployments    | 2          |
 | **PersistentVolumes**    | PVCs created and mounted for both WordPress and MySQL                          | 2          |
-| **Functionality**        | WordPress loads successfully via port-forward or ingress                       | 3          |
+| **Functionality**        | WordPress loads successfully via port-forward                                  | 3          |
 
 **Total Points:** 15
 
@@ -191,7 +192,14 @@ A **GitHub Actions workflow** will run on every commit to validate your manifest
 - Correct environment variable mounting from ConfigMaps and Secrets
 - An accessible WordPress installation page (HTTP 200 response from `/wp-admin/install.php`)
 
-You can test your setup locally using the same script:
+You can test your setup locally using the same script. First create a cluster using the provided [`kind.yaml`](./kind.yaml) (1 control-plane + 2 worker nodes; see the [kind guide](./docs/kind.md)):
+
+```bash
+kind create cluster --name wordpress --config kind.yaml
+kubectl apply -f manifests/
+```
+
+Then run:
 
 ```bash
 ./check.sh

@@ -5,12 +5,15 @@
 ### initial setup
 
 ```bash
-# start minikube cluster
-minikube start
+# make sure docker is running
+docker info
+
+# create a kind cluster
+kind create cluster --name wordpress --config kind.yaml
 
 # verify cluster is running
-minikube status
-kubectl cluster-info
+kind get clusters
+kubectl cluster-info --context kind-wordpress
 ```
 
 ### deploy your manifests
@@ -53,6 +56,49 @@ you should see the wordpress setup page if everything is configured correctly.
 ---
 
 ## common errors and solutions
+
+### kind cluster won't create
+
+**symptoms:**
+- `kind create cluster` fails or hangs
+- `Cannot connect to the Docker daemon`
+
+**debug steps:**
+```bash
+# is docker running?
+docker info
+
+# see leftover clusters/containers
+kind get clusters
+docker ps -a
+
+# clean up and retry
+kind delete cluster --name wordpress
+kind create cluster --name wordpress --config kind.yaml
+
+# export logs for inspection
+kind export logs --name wordpress ./kind-logs
+```
+
+**common causes:**
+- docker not running, or your user lacks permission to use it
+- a cluster with the same name already exists
+- not enough cpu/memory/disk allocated to docker
+
+---
+
+### kubectl talks to the wrong cluster
+
+**symptoms:**
+- `kubectl get nodes` shows nothing from kind, or connection refused
+
+**fix:**
+```bash
+kubectl config get-contexts
+kubectl config use-context kind-wordpress
+```
+
+---
 
 ### pods not starting
 
@@ -140,7 +186,7 @@ kubectl describe pvc <pvc-name>
 ```
 
 **common causes:**
-- no storage class available (minikube provides one by default)
+- no storage class available (kind provides a `standard` one by default; check with `kubectl get storageclass`)
 - pvc name in deployment doesn't match the actual pvc name
 - volume not mounted at correct path in container spec
 
@@ -195,24 +241,3 @@ kubectl get secret
 - configmap or secret missing required keys
 - wordpress not returning http 200 (usually means pods not ready or connection issues)
 
----
-
-## iterative development workflow
-
-1. **make changes** to manifest files
-2. **apply changes**: `kubectl apply -f manifests/`
-3. **check status**: `kubectl get pods -w`
-4. **debug if needed**: `kubectl logs` and `kubectl describe`
-5. **run validation**: `./check.sh`
-6. **repeat** until all checks pass
-
----
-
-## general debugging workflow
-
-1. **check resource exists**: `kubectl get <resource-type>`
-2. **check resource details**: `kubectl describe <resource-type> <name>`
-3. **check logs**: `kubectl logs <pod-name>`
-4. **check events**: `kubectl get events --sort-by='.lastTimestamp'`
-5. **verify labels match**: ensure service selectors match deployment pod labels
-6. **test connectivity**: use `kubectl exec` to test connections from inside pods
