@@ -13,10 +13,12 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Start minikube
-        uses: medyagh/setup-minikube@5162ff23a2613f64e1f7298e5bb47514db073347
+      - name: Start kind cluster
+        uses: helm/kind-action@v1.12.0
         with:
-          minikube-version: 1.33.0
+          version: v0.33.0
+          node_image: kindest/node:v1.37.0@sha256:a1ed56cfb0e7b93589bdf97c8cd566405a265939e3620fc4f5de89adff580ae5
+          cluster_name: wordpress
 
       - name: Apply Kubernetes manifests
         run: |
